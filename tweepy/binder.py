@@ -28,6 +28,7 @@ def bind_api(**config):
         method = config.get('method', 'GET')
         require_auth = config.get('require_auth', False)
         search_api = config.get('search_api', False)
+        upload_api = config.get('upload_api', False)
         use_cache = config.get('use_cache', True)
         session = requests.Session()
 
@@ -56,6 +57,8 @@ def bind_api(**config):
             # Pick correct URL root to use
             if self.search_api:
                 self.api_root = api.search_root
+            elif self.upload_api:
+                self.api_root = api.upload_root
             else:
                 self.api_root = api.api_root
 
@@ -64,6 +67,8 @@ def bind_api(**config):
 
             if self.search_api:
                 self.host = api.search_host
+            elif self.upload_api:
+                self.host = api.upload_host
             else:
                 self.host = api.host
 

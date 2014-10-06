@@ -15,11 +15,12 @@ class API(object):
     """Twitter API"""
 
     def __init__(self, auth_handler=None,
-                 host='api.twitter.com', search_host='search.twitter.com',
-                 cache=None, api_root='/1.1', search_root='',
-                 retry_count=0, retry_delay=0, retry_errors=None, timeout=60,
-                 parser=None, compression=False, wait_on_rate_limit=False,
-                 wait_on_rate_limit_notify=False, proxy=''):
+                host='api.twitter.com', search_host='search.twitter.com',
+                upload_host='upload.twitter.com', cache=None, secure=True,
+                api_root='/1.1', search_root='', upload_root='/1.1',
+                retry_count=0, retry_delay=0, retry_errors=None, timeout=60,
+                parser=None, compression=False, wait_on_rate_limit=False,
+                wait_on_rate_limit_notify=False):
         """ Api instance Constructor
 
         :param auth_handler:
@@ -43,8 +44,10 @@ class API(object):
         self.auth = auth_handler
         self.host = host
         self.search_host = search_host
+        self.upload_host = upload_host
         self.api_root = api_root
         self.search_root = search_root
+        self.upload_root = upload_root
         self.cache = cache
         self.compression = compression
         self.retry_count = retry_count
@@ -197,6 +200,18 @@ class API(object):
             ],
             require_auth=True
         )(*args, **kwargs)
+
+    def upload_media(self, filename, *args, **kwargs):
+        """ media/upload """
+        headers, post_data = API._pack_image(filename, 3072, form_field='media')
+        kwargs.update({'headers': headers, 'post_data': post_data})
+
+        return bind_api(
+            path = '/media/upload.json',
+            method = 'POST',
+            payload_type = 'json',
+            upload_api = True
+        )(self, *args, **kwargs)
 
     @property
     def destroy_status(self):
